@@ -1,0 +1,68 @@
+\documentclass[12pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\input{commands}
+
+%SetFonts
+
+%SetFonts
+
+
+\title{Optimal Control on Chemotherapy for Breast Cancer Treatment}
+\date{24 Mar 2025}							% Activate to display a given date or no date
+\author{Joseph Humpherys, Henry Fetzer, Clifton Langley, Oscar J. Escobar}
+\begin{document}
+\maketitle
+
+The American Cancer Society estimates that about 316,000 new breast cancer diagnoses will be made in 2025, with the vast majority being Invasive Ductal Carcinoma (IDC).
+The CDC estimates that 1 out of 100 breast cancer diagnosis will be for a man.
+The treatment options are surgery, chemotherapy, or radiation, or a mix of all (depending on the stage of the cancer). 
+
+For patients that choose to opt for chemotherapy, the effects are generally weight loss, loss of hair, fatigue, and lower normal and  immune cell count, amongst others.
+The effects stem from the dosage of the drugs that are prescribed to the patient.
+The most common treatment used in the early stages of IDC is called AC, which is comprised of doxorubicin (Adriamycin) and cyclophosphamide (Cytoxan).
+The former is used to stop the cancer cells from growing and the latter from reproducing.
+This AC treatment is administered in doses every 2-3 weeks for a total of 4-6 doses (i.e. spanning 2-6 months).
+Thus, a patient must live with the side effects of cancer for at least 2-6 months.
+
+Our main goal is to first find the optimal amount of chemotherapy of AC treatment that will minimize the total dosage administered (given in doses every three weeks) to the patient and reduce the final tumor burden of IDC at the end of the treatment.
+This would help lower the tumor burden to the point that the Natural Killer (NK) and CD8$^+$ immune cells can take over and kill the remaining IDC cells.
+We assume that the drug is administered mainly by the body surface area (BSA) of a person at the start of treatment, which is the main component looked at when assigning chemo.
+Once we get this first goal, we would like to optimize the scheduling.
+That is, the time between doses.
+
+Let $\x(t) = \begin{bmatrix} T(t) \\ N(t) \\ CD(t) \\ NK(t)\end{bmatrix}$ be the state vector at time $t$ representing the tumor burden $T=T(t)$ of IDC, $N=N(t)$ be the number of normal cells in one breast tissue, $NK=NK(t)$ be the number of NK cells in the breast tissue, and $CD=CD(t)$ be the number of CD8$^+$ cells in one breast tissue.
+Moreover, let the control be given by $\mathbf{u}(t) = \begin{bmatrix} D_d(t) \\ D_c(t) \end{bmatrix}$, where the $D_d(t)$ is the concentration of doxorubicin, measured in mg, found in the body and $D_c(t)$ is the concentration (in mg) of cyclophosphamide.
+The concentration of each drug $D$ is governed by $D(t)=\sum_{i=0}^{5}q_iH(t - 21i)e^{-\beta t}$, where $H$ is a step function, $\beta$ is a decay rate, and $q_i$ is the amount, in mg, of the $i^\text{th}$ dose.
+Note that we add a subscript of $c$ or $d$ to $q$ and $\beta$ to denote the specific AC drug we are seeking to measure.
+Our cost functional for our first goal takes on the form, using $\xi$ to denote the costs/weight we give to each term, of
+\begin{align*}
+	J[\mathbf{u}] = \int_0^{126} \xi_d D_d^2(t) + \xi_c D_d^2(t) + T^2(t) \diff t + \xi_{126} T^2(126)
+\end{align*}
+The concentration for each drug must meet the following constraints
+\begin{align*}
+	0 \le q_{c_i} \le 800mg*BSA \\
+	0 \le q_{d_i} \le 80mg*BSA
+\end{align*}
+Furthermore, the elements of the state evolve according to 
+\begin{align*}
+	\frac{\diff T(t)}{\diff t} &= g_T T \ln \Bigl( \frac{T_{max}}{T} \Bigr)- a_1NT - a_2NKT - a_3CDT - \Bigl(E_c D_c +\frac{4}{5}E_d D_d \Bigr)T, \\
+	\frac{\diff N(t)}{\diff t} &= g_N N \ln\Bigl(\frac{N_{max}}{N} \Bigr) - k_N - a_0NT, \\
+	\frac{\diff CD(t)}{\diff t} &= r_{CD} - k_{CD} - \frac{\rho_0 CDT ^ i}{\alpha_0 + T^i} - a_4CDT - b_{CD}D_cCD, \\
+	\frac{\diff NK(t)}{\diff t} &=r_{NK} - k_{NK} - \frac{\rho _1NKT^i}{\alpha_1 + T^i}. \\
+\end{align*}
+BSA is given by $(1/60)\frac{1}{\sqrt{h * w}}$, where $h$ is the height of a person, measured in cm, and $w$ is the weight of that same person, measured in kg.
+
+Our equations use the following constants and/or symbols:
+\begin{itemize}
+	\item $t$: time and is measured in days
+	\item $g$: growth rate of cell, where subscript denotes the specific growth rate of the cell (e.g. $g_{CD}$ is the growth rate of CD8$^+$)
+	\item $k$: natural death rate of cell where the subscript denotes a specific cell.
+	\item $a$: the various uses  $a$ are competition constants for the cells been looked at
+	\item $\rho, \alpha$: Michaelis-Menten kinetics (MMK) constants to control the death rate of cancer by either NK or CD8$^+$ cells. MMK is used to describe immune cell recruitment.
+	\item $i$: an exponent to also control the MMK kinetics
+	\item $r$: the rate at which CD8$^+$ or NK cells enter the naturally breast (by natural patrolling of the immune system).
+	\item $E$: a constant denoting the effectiveness of cyclophosphamide or doxorubicin in killing IDC cells. The $\frac{4}{5}$ denotes the proportion of ICD cells that doxorubicin targets. We assume that cyclophosphamide targets all (i.e. 1).
+	\item $b_{CD}$: a constant to denote the effect of cyclophosphamide has on CD8$^+$ cells, which we assume is less than $E_c$. Doxorubicin's effect on the immune system is undetermined.
+	
+\end{itemize}
+
+\end{document}  
