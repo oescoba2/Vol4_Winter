@@ -1,0 +1,44 @@
+\documentclass[12pt]{article}
+\input{commands}
+
+
+% Document
+\begin{document}
+\title{Something Cool}
+\date{\vspace{-9ex}}
+\maketitle
+\section{Motivation}
+Hello
+
+We assume that we are working with a woman of age 65, height of 161.8 cm, and weight of 75.5 kg.
+
+
+Our functional is 
+\begin{align*}
+	J[\mathbf{u}] = \int_0^{156}\mathbf{u}(t)^{\trp} Q \mathbf{u}(t)+ T^2(t) \diff t + \xi_{156} T^2(156)
+\end{align*}
+
+The concentration for each drug must meet the following constraints
+\begin{align*}
+	0 \le q_{c_i} \le 800mg*BSA \\
+	0 \le q_{d_i} \le 80mg*BSA
+\end{align*}
+Furthermore, the elements of the state evolve according to 
+\begin{align*}
+	\frac{\diff T(t)}{\diff t} &= g_T T \ln \Bigl( \frac{T_{max}}{T} \Bigr)- a_1NT - a_2NKT - a_3CDT - \Bigl(E_c D_c +\frac{4}{5}E_d D_d \Bigr)T, \\
+	\frac{\diff N(t)}{\diff t} &= g_N N \ln\Bigl(\frac{N_{max}}{N} \Bigr) - k_N - a_0NT, \\
+	\frac{\diff CD(t)}{\diff t} &= r_{CD} - k_{CD} - \frac{\rho_0 CDT ^ i}{\alpha_0 + T^i} - a_4CDT - b_{CD}D_cCD, \\
+	\frac{\diff NK(t)}{\diff t} &=r_{NK} - k_{NK} - \frac{\rho _1NKT^i}{\alpha_1 + T^i}. \\
+\end{align*}
+
+
+\appendix
+\section{Definitions}
+\begin{itemize}
+	\item Invasive Ductal Carcinoma: invasive breast cancer that starts in the milk ducts, the tubes that carry milk from the lobules to the nipple. \cite{TypesDePolo}
+Hello
+\end{itemize}
+
+\bibliographystyle{plain}  % Choose a bibliography style (e.g., plain, abbrv, alpha, etc.)
+\bibliography{refs}
+\end{document}

@@ -1,0 +1,36 @@
+\usepackage{amsmath, amssymb, amsthm, amsfonts, algpseudocode, algorithm, bbm, color, fixmath, float, graphicx, hyperref, listings, mathrsfs, mathtools, subfig} 
+
+%Needed commands
+\newcommand*{\w}{\mathbf{w}}
+\newcommand*{\x}{\mathbf{x}}
+\newcommand*{\y}{\mathbf{y}}
+\newcommand*{\z}{\mathbf{z}}
+\newcommand*{\R}{\mathbb{R}}
+\newcommand*{\E}{\mathbb{E}}
+\newcommand*{\0}{\mathbf{0}}
+\newcommand*{\minimizer}{\mathbf{x}^*}
+\newcommand*{\dprime}{{\prime\prime}}
+\newcommand{\li}[1]{\lstinline[prebreak=]!#1!}
+\newcommand{\pseudoli}[1]{\lstinline[style=pseudo]!#1!}
+\newcommand{\trp}{^{\mathsf T}} 
+\newcommand{\im}{{i\mkern1mu}}
+\newcommand{\Real}{\mathchardef\Re="023C}
+\newcommand{\Imag}{\mathchardef\Im="023D}
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+\newcommand*\Eval[3]{\left.#1\right\rvert_{#2}^{#3}}
+
+%Operators
+\DeclareMathOperator{\argmin}{argmin}
+\DeclareMathOperator{\argmax}{argmax}
+
+%Link set up
+\hypersetup{
+    colorlinks=true, %set true if you want colored links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+    linkcolor=blue,  %choose some color if you want links to stand out
+    pdftitle={RL Notes},
+    pdfpagemode=FullScreen
+}
+
+\endinput
