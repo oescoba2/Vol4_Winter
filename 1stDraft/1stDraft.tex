@@ -12,24 +12,85 @@ Hello
 
 We assume that we are working with a woman of age 65, height of 161.8 cm, and weight of 75.5 kg.
 
+Our state vector is $\x(t) = \begin{bmatrix} T(t) & N(t) & CD(t) & NK(t) \end{bmatrix}^{\trp}$ where $T(t)$ be the IDC burden at time $t$, measured in days, $N(t)$ be the cell count of normal epithelial cells, $CD(t)$ be the CD8$^+$ cell count, and $NK(t)$ be the count of NK cells.
+ All of these located at the duct where IDC begins. 
+We denote the control vector as $\mathbf{u}(t)=\begin{bmatrix} D_c(t) & D_d(t) \end{bmatrix}^{\trp}$ where $D_d$ is the drug concentration of doxorubicin and $D_c$ the drug concentration of cyclophosphamide.
+We consider the problem of modeling AC treatment for a total of 6 doses administered every 21 days plus an extra 30 days after the end of the treatment (156 days total).
+
 
 Our functional is 
 \begin{align*}
 	J[\mathbf{u}] = \int_0^{156}\mathbf{u}(t)^{\trp} Q \mathbf{u}(t)+ T^2(t) \diff t + \xi_{156} T^2(156)
 \end{align*}
+where $Q = \begin{bmatrix} \xi_c & 0 \\ 0 & \xi_d \end{bmatrix}$ denotes the positive weights for each of the elements of $\mathbf{u}$ and $ \xi_{156}$ the final weight for the final tumor population at the end of 156 days. 
 
-The concentration for each drug must meet the following constraints
+The concentration for each drug must meet the following constraints (sum of each max dose)
 \begin{align*}
-	0 \le q_{c_i} \le 800mg*BSA \\
-	0 \le q_{d_i} \le 80mg*BSA
+	0 \le D_d \le 1,700 \frac{\text{mg}}{\text{m}^2} \\
+	0 \le D_c \le 127.5 \frac{\text{mg}}{\text{m}^2}
 \end{align*}
 Furthermore, the elements of the state evolve according to 
 \begin{align*}
-	\frac{\diff T(t)}{\diff t} &= g_T T \ln \Bigl( \frac{T_{max}}{T} \Bigr)- a_1NT - a_2NKT - a_3CDT - \Bigl(E_c D_c +\frac{4}{5}E_d D_d \Bigr)T, \\
-	\frac{\diff N(t)}{\diff t} &= g_N N \ln\Bigl(\frac{N_{max}}{N} \Bigr) - k_N - a_0NT, \\
-	\frac{\diff CD(t)}{\diff t} &= r_{CD} - k_{CD} - \frac{\rho_0 CDT ^ i}{\alpha_0 + T^i} - a_4CDT - b_{CD}D_cCD, \\
-	\frac{\diff NK(t)}{\diff t} &=r_{NK} - k_{NK} - \frac{\rho _1NKT^i}{\alpha_1 + T^i}. \\
+	\frac{\diff T(t)}{\diff t} &= g_T T \ln \Bigl( \frac{T_{\max}}{T} \Bigr)- a_1NT - a_2NKT - a_3CDT - \Bigl(E_c D_c +\frac{4}{5}E_d D_d \Bigr)T, \\
+	\frac{\diff N(t)}{\diff t} &= g_N N \ln\Bigl(\frac{N_{\max}}{N} \Bigr) - k_N N - a_0NT, \\
+	\frac{\diff CD(t)}{\diff t} &= r_{CD} - k_{CD} CD - \frac{\rho_0 CDT ^ i}{\alpha_0 + T^i} - a_4CDT - b_{CD}D_cCD, \\
+	\frac{\diff NK(t)}{\diff t} &=r_{NK} - k_{NK} NK - \frac{\rho _1NKT^i}{\alpha_1 + T^i}. - a_5 NK T\\
 \end{align*}
+In order to be able to incorporate these hard constraints, we add in the following equations
+\begin{align*}
+	\frac{\alpha_1}{1 + (D_d - 1,700)^{\lambda_1}} \\
+	\frac{\alpha_2}{1 + D_d ^{\lambda_2}} \\
+	\frac{\alpha_3}{1 + (D_c - 127.5)^{\lambda_3}} \\
+	\frac{\alpha_4}{1 + (D_c)^{\lambda_4}}
+\end{align*}
+These allow us to transform the hard constraints into hard constraints.
+The $\lambda_j$ terms denote exponents that can be used to move the model to lower dosage as increase $\lambda_j$ would lead to.
+The $\alpha_j$ terms denote the weights
+
+Thus, our cost functional becomes
+\begin{align*}
+	J[\mathbf{u}] &= \int_0^{156}\mathbf{u}(t)^{\trp} Q \mathbf{u}(t)+ T^2(t) + \frac{\alpha_1}{1 + (D_d - 1,700)^{\lambda_1}} + \frac{\alpha_2}{1 + D_d ^{\lambda_2}} \\
+	                    &+ \frac{\alpha_3}{1 + (D_c - 127.5)^{\lambda_3}} + \frac{\alpha_4}{1 + D_c^{\lambda_4}} \diff t + \xi_{156} T^2(156)
+\end{align*}
+
+The Hamiltonian becomes
+\begin{align*}
+	H &= H(t, \x(t), \mathbf{u}(t), \mathbf{p}(t)) = \mathbf{p}(t)\cdot \x^\prime(t) - L(t, \x(t), \mathbf{u}(t)) \\
+	   &= g_T p_1T\ln\Biggl(\frac{T_{\max}}{T} \Biggr)-a_1 p_1NT-a_2 p_1NKT-a_3p_1CDT-p_1\biggl(E_cD_c+\frac{4}{5}E_dD_d \biggr)T\\
+	   &+g_Np_2N\ln\Biggl(\frac{N_{\max}}{N}\Biggl)-k_Np_2N-a_0p_2NT\\
+	   &+r_{CD} p_3-k_{CD} p_3 CD-p_3\frac{\rho_0CDT^i}{\alpha_0+T^i}-a_4p_3CDT-b_{CD}p_3D_cCD\\
+	   &+r_{NK}p_4-k_{NK} p_4NK-p_4\frac{\rho_1NKT^i}{\alpha_1+T^i}-a_5p_4NKT\\
+	   &-\xi_cD_c^2-\xi_dD_d^2-T^2-\gamma_1D_c-\gamma_2D_d - \frac{\alpha_1}{1 + (D_d - 1,700)^{\lambda_1}} - \frac{\alpha_2}{1 + D_d ^{\lambda_2}} \\
+	   & -  \frac{\alpha_3}{1 + (D_c - 127.5)^{\lambda_3}} - \frac{\alpha_4}{1 + D_c^{\lambda_4}} 
+\end{align*}
+
+By Pontryagin's principle, we have
+\begin{align*}
+	\frac{DH}{D\mathbf{u}} &=\begin{bmatrix} \frac{\partial{H}}{\partial{D_c}} \frac{\partial{H}}{\partial{D_d}}\end{bmatrix} =\mathbf{0}
+\end{align*}
+Hence, 
+\begin{align*}
+0 &= \frac{\partial{H}}{\partial{D_c}} = -p_1E_cT-p_3b_{CD}CD-2\xi_cD_c+ \frac{\alpha_3 \lambda_3 (D_c - 127.5)^{\lambda_3 - 1}}{(1 + (D_c - 127.5)^{\lambda_3})^{2}} + \frac{\alpha_4 \lambda_4 D_c^{\lambda_4 -1}}{(1 + D_c^{\lambda_4})^2} \\
+0 &= \frac{\partial{H}}{\partial{D_d}} = -\Bigl(\frac{4E_d}{5} \Bigr) p_1 T-2\xi_dD_d + \frac{\alpha_1 \lambda_1 (D_d - 1,700)^{\lambda_1 - 1}}{(1 + (D_d - 1,700)^{\lambda_1})^2} + \frac{\alpha_2 \lambda_2 D_d^{\lambda_2-1}}{(1 + D_c^{\lambda_2})^2}
+\end{align*}
+
+
+Moreover, we also know that $\mathbf{p}^\prime = -\frac{DH}{D\x}$ and that $\mathbf{p}(156) =- \frac{D\phi}{D\x(156)}$, where $\phi(\x(156)) = \xi_{156}T^2(156)$.
+We have 
+\begin{align*}
+	p_1^\prime &=-\Biggr(-g_Tp_1+g_T p_1\ln\biggl(\frac{T_{max}}{T} \biggr)-a_1p_1N-a_2 p_1NK-a_3 p_1CD-p_1\biggl(E_cD_c+\frac{4}{5}E_dD_d \biggr)\\
+			  &-a_0 p_2  N + \frac{-(\alpha_0+T^i)(i\rho_0 p_3CDT^{i-1})+(\rho_0 p_3CDT^i)(iT^{i-1})}{(\alpha_0+T^i)^2}-a_4 p_3CD \\
+			  &+\frac{-(\alpha_1+T^i)(i\rho_1p_4NKT^{i-1})+(\rho_1p_4NKT^i)(iT^{i-1})}{(\alpha_1+T^i)^2}-a_5p_4NK-2T \Biggr) \\
+        p_2^\prime &=-(-a_1p_1T+g_Np_2\ln\Bigl(\frac{N_{max}}{N}\Bigr)-g_Np_2 - k_N p_2-a_0p_2T) \\
+        p_3^\prime &= -(-a_3 p_1T-k_{CD}p_3-p_3\frac{\rho_0T^i}{\alpha_0+T^i}-a_4 p_3T-b_{CD}p_3D_c) \\
+        p_4^\prime &= - (-a_2p_1T-k_{NK}p_4-p_4\frac{\rho_1T^i}{\alpha_1+T^i}-a_5 p_4T)
+\end{align*}
+with $p_1(156) = -2\xi_{156}T(156)$ and $p_2(156)=p_3(156)=p_4(156)= 0$
+
+
+
+
+
 
 
 \appendix
