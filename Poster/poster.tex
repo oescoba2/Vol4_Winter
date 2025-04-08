@@ -104,97 +104,103 @@
 
 \begin{document}
 
-\FancyTitle{Smart Dosing}{Optimal Control of AC Treatment in IDC}{Oscar J. Escobar, Joseph Humpherys, Henry Fetzer, Clifton Langley}
-
+\FancyTitle{Smart Dosing}{Optimal Control of AC Treatment in IDC}{Óscar J. Escobar, Joseph Humpherys, Henry Fetzer, Clifton Langley}
 %Main
 \color{black}
 \noindent
 \begin{minipage}{\linewidth + 2\fboxsep}
 \begin{multicols*}{\NumColumns}
     \FancySubtitle[5mm]{Overview}
-        \begin{center}
-          \includegraphics[width=1\linewidth,trim={0 1.5cm 0 4.25cm},clip]{./imgs/idc}
-          {\small \textbf{Figure 1.} A visual overview of IDC morphology extracted from cancer.gov.}
-        \end{center}
-        
         \large
-       The American Cancer Society estimates that about 316,000 new breast cancer diagnoses will be made in 2025, with the vast majority being Invasive Ductal Carcinoma (IDC).
-       For patients with IDC, the Adriamycin - Cytoxan (AC) treatment, comprised of doxorubicin and cyclophosphamide, is the most common administered chemotherapy treatment.
-
-Keep in mind that you want the font size to be relatively large to make readability a maximum.
-
-
-
-    \FancySubtitle[0cm][2cm]{The problem}
-    
-        \begin{center}
-        \LARGE{\textbf{Assumptions \& Equations}}
-        \end{center}
-        \vspace{5mm}
-            \large
         
- Let $T(t)$ be the IDC burden at time $t$, measured in days, $N(t)$ be the cell count of normal epithelial cells, $CD(t)$ be the CD8$^+$ cell count, and $NK(t)$ be the count of NK cells.
- All of these located at the duct where IDC begins. 
-We denote the control vector as $\mathbf{u}(t)=\begin{bmatrix} D_c(t) & D_d(t) \end{bmatrix}^{\trp}$ where $D_d$ is the drug concentration of doxorubicin and $D_c$ the drug concentration of cyclophosphamide.
-We consider the problem of modeling AC treatment for a total of 6 doses administered every 21 days plus an extra 30 days after the end of the treatment (156 days total).
-We have that the cost functional is 
-
-\begin{align*}
-	J[\mathbf{u}] = \int_0^{156}\mathbf{u}(t)^{\trp} Q \mathbf{u}(t)+ T^2(t) \diff t + \xi_{156} T^2(156)
-\end{align*}
-where $Q = \begin{bmatrix} \xi_c & 0 \\ 0 & \xi_d \end{bmatrix}$ denotes the positive weights for each of the elements of $\mathbf{u}$ and $ \xi_{156}$ the final weight for the final tumor population at the end of 156 days. 
-
-As the sun dipped below the horizon, casting hues of orange and pink across the sky, the quaint village came to life with the soft chatter of its inhabitants. Children chased each other through narrow cobblestone streets, their laughter echoing against the ancient stone walls. The scent of freshly baked bread wafted from the local bakery, enticing passersby with its warm embrace. In the distance, the sound of church bells rang out, signaling the end of another peaceful day in this idyllic countryside retreat.
-
-
+        \indent Mathematical Oncology (MO) is described as a ``a bridge between $\ldots$ the biologist and practician clinician " [RR19].
+        Tumor modeling is an area of MO whose objective is to create and understand models that can help clinicians understand properties that govern tumor growth, the effects of treatments, and other factors like toxicity to the person, or the affects of the immune system on cancerous tumor. 
+        However, the majority of models do not look into personalized treatments that can be adaptive to the response of a person as the modeling focuses in understanding dynamics.\\
+        
+        \indent Optimal control theory (OTC) seeks to find the best possible control strategy for a dynamical system by optimizing a performance criterion while following constraints and dynamics of system.
+        OTC can be combined with tumor modeling by leaving the chemotherapy unknown so that solving the optimizing problem according to tumor modeling constraints can help us find a personalized chemotherapy function.
+        This would help us examine better how certain treatments affect the tumor and the patient as we vary the chemotherapy administered. 
+    \vspace{-17mm}
+    
+    \FancySubtitle[0cm][2cm]{The problem}
+            \large 
+            
+             \includegraphics[width=1\linewidth,trim={0 1.5cm 0 4.25cm},clip]{./imgs/idc}
+  \begin{center}
+          {\small \textbf{Figure 1.} A visual overview of IDC morphology retrieved from cancer.gov.}
+   \end{center}
+            
+       Since the American Cancer Society estimates that 80\% of new breast cancer diagnoses in 2025 will be Invasive Ductal Carcinoma (IDC), we decided to work with IDC.
+      For patients with IDC, the AC treatment (comprises doxorubicin and cyclophosphamide) is the most common chemo treatment administered.
+      We decided to look only at Natural Killer (NK) and  CD8$^+$ T cells since these two are the main immune cells attacking the majority of breast cancers [ABZ21].
+      Moreover, from what we learned in our last cancer modeling project, we decided to also look at the population of normal cells, which for IDC are the normal epithelial cells of the milk duct where IDC begins.\\
+      
+The AC treatment is typically given in doses spread across, at most, 126 days.
+The dosage of AC administered to a patient primarily depends on several factors like height, weight, cancer cell count amongst others.
+Furthermore, the purpose of AC is treat early-stage localized breast cancer by killing cancer from inside the cells, damaging the DNA of cancer cells, and stopping their reproduction [Breast Cancer.org].
+Thus, we need to also look some point after 126 days to see if the total IDC cell count is eradicated or low enough so that the immune system can kill any remaining cells.
 
             \columnbreak
-            You could use Tikz to make figures (if you want)
             
-            \begin{center}
-                \vspace{5mm}
-                \begin{tikzpicture}
-                    \draw[thick] (0,0) rectangle ++(4,2) node[midway] {\textsc{\texttt{Input}}};
-                    \draw[thick] (6,0) rectangle ++(4,2) node[midway] {\textsc{\texttt{Merge}}};
-                    \draw[thick] (14,0) rectangle ++(5,2) node[midway] {\textsc{\texttt{Leaving}}};
-                    \draw[thick] (3,-4) rectangle ++(5,2) node[midway] {\textsc{\texttt{Queue}}};
-                    \draw[-{Latex[length=5mm]}, ultra thick] (-3, 1) -- (0, 1) node[pos=.4, fill=white] {$\alpha$};
-                    \draw[-{Latex[length=5mm]}, ultra thick] (0, -3) -- (3, -3) node[pos=.4, fill=white] {$\beta$};
-                    \draw[-{Latex[length=5mm]}, ultra thick] (4, 1) -- (6, 1) node[pos=.4,above] {$\gamma$};
-                    \draw[-{Latex[length=5mm]}, ultra thick] (10, 1) -- (14, 1) node[midway,above] {$\delta$} node[midway,below] {(slow)};
-                    \draw[-{Latex[length=5mm]}, ultra thick] (6,-2) -- (8,0) node[near start,sloped,above] {$u$};
-                \end{tikzpicture}
-                \vspace{5mm}
-            \end{center}
-        
-        \begin{center}
-        \LARGE{\textbf{The approach}}
-        \end{center}
-            \large
-        
-            Describe what you are going to try and accomplish
-	As the sun dipped below the horizon, casting hues of orange and pink across the sky, the quaint village came to life with the soft chatter of its inhabitants. Children chased each other through narrow cobblestone streets, their laughter echoing against the ancient stone walls. The scent of freshly baked bread wafted from the local bakery, enticing passersby with its warm embrace. In the distance, the sound of church bells rang out, signaling the end of another peaceful day in this idyllic countryside retreat.
+\vspace{1mm}
 
+\begin{center}
+        \LARGE{\textbf{Modeling Assumptions \& Equations}}
+\end{center}
+\large
+\vspace{-2mm}
 
-            
-            \FancyFigure{./imgs/img}{Figure caption.}{fig:evolution-comparison}
-        
+           
+Let $T(t)$ be the IDC burden at time $t$,  with $t$ measured in days, $N(t)$ be the cell count of normal epithelial cells, $CD(t)$ be the CD8$^+$ cell count, and $NK(t)$ be the count of NK cells.
+Denote the state vector as $\x(t) = \begin{bmatrix}T & N & CD & NK\end{bmatrix}^{\trp}$.
+We decided to model competition between the $N$ and $T$ as well as the growth for both following Gompertzian growth.
+We also decided to add Michaelis-Menten kinetics to factor in tumor cell lysis and immune cell recruitment in both NK and CD.
+Since IDC starts off localized, we decided to consider the natural death of both immune cells and some constant inflow rate of these into the ductal region.
+Lastly, we also added in death rates that either come naturally or by interaction for all cells
+Thus, components of our state evolve according to
+            \begin{align*}
+           	 \frac{\diff T(t)}{\diff t} = g_T T \ln &\Bigl( \frac{T_{\max}}{T} \Bigr)- a_1NT - a_2NKT - a_3CDT -\Bigl( E_c D_c  +\frac{4}{5}E_d D_d\Bigr) T, \\
+            	\frac{\diff N(t)}{\diff t} &= g_N N \ln\Bigl(\frac{N_{\max}}{N} \Bigr) - k_N N - a_0NT, \\
+		\frac{\diff CD(t)}{\diff t} &= r_{CD} - k_{CD} CD - \frac{\rho_0 CDT ^ i}{\alpha_0 + T^i} - a_4CDT - b_{CD}D_cCD, \\
+	         \frac{\diff NK(t)}{\diff t} &=r_{NK} - k_{NK} NK - \frac{\rho _1NKT^i}{\alpha_1 + T^i} - a_5 NK T.
+            \end{align*}
+
+Denote the control $\mathbf{u}(t)=\begin{bmatrix} D_c(t) & D_d(t) \end{bmatrix}^{\trp}$ where $D_d$ is the drug concentration of doxorubicin and $D_c$ the drug concentration of cyclophosphamide, and both are measured in  $\frac{\text{mg}}{\text{m}^2} $.
+To simplify the chemotherapy, we decided to use the average height and average weight of a  65 year old woman.
+This helps us find constraints that our optimal control must satisfy, which are
+\[
+\begin{bmatrix} 0\\  0  \end{bmatrix} \leq \mathbf{u} \leq \begin{bmatrix} 1,700\\  127.5  \end{bmatrix} \\
+\]
+
         \begin{center}
         \vspace{2cm}
-        \LARGE{\textbf{Another heading}}
+        \LARGE{\textbf{The Cost Functional}}
         \end{center}
-            \large
-        
-            As the sun dipped below the horizon, casting hues of orange and pink across the sky, the quaint village came to life with the soft chatter of its inhabitants. Children chased each other through narrow cobblestone streets, their laughter echoing against the ancient stone walls. The scent of freshly baked bread wafted from the local bakery, enticing passersby with its warm embrace. In the distance, the sound of church bells rang out, signaling the end of another peaceful day in this idyllic countryside retreat.
+         	\large
+         
+We consider the problem of finding an optimal AC treatment for a total of 156 days.
+The first 126 days corresponde to the normal AC treatment schedule and the last 30 days will be used to monitor how much cancer is remaining. 
+The hope is that either the cancer will be eradicated after 126 days or that remainder can be handled by the interactions of the immune cells within 30 days.
+Our cost functional (the OTC performance criterion) takes the form of 
+\begin{align*}
+	J[\mathbf{u}] = \int_0^{126}\mathbf{u}(t)^{\trp} Q \mathbf{u}(t)+ T^2(t) \diff t + \xi_{126} T^2(126)
+\end{align*}
+where $Q = \begin{bmatrix} \xi_c & 0 \\ 0 & \xi_d \end{bmatrix}$ denotes the positive weights for each of the elements of $\mathbf{u}$ and similarly for $ \xi_{126}$.\\
 
+The Lagrangian $L(t, \x(t),\mathbf{u}(t))=\mathbf{u}^{\trp} Q \mathbf{u}+ T^2$ helps us take into consideration the fact we do not want to overdose a person as we administer the chemo as well as incorporating the number of IDC cells present through out the treatment.
+The endpoint cost of $\phi(\x(126)) = \xi_{126} T^2(126)$ will help us ensure we penalize the final population of $T$ once the treatment is done. 
 
-        \columnbreak
-        \begin{center}
-        \LARGE{\textbf{Infinite-Time LQR}}
-        \end{center}
+\vspace{-6mm}
+    \FancySubtitle[0cm][2cm]{The Approach}
+            \large 
 
-            Only if you actually used Infinite-Time LQR?
-As the sun dipped below the horizon, casting hues of orange and pink across the sky, the quaint village came to life with the soft chatter of its inhabitants. Children chased each other through narrow cobblestone streets, their laughter echoing against the ancient stone walls. The scent of freshly baked bread wafted from the local bakery, enticing passersby with its warm embrace. In the distance, the sound of church bells rang out, signaling the end of another peaceful day in this idyllic countryside retreat.
+Before we can begin finding an optimal control, we needed to find a way to incorporate the hard constraints that $\mathbf{u}$ must follow. 
+Our initial approach was to incorporate those into our cost functional; that is, we decided to modify them as soft constraints.
+We added $\frac{\alpha}{1 + (D - \text{bound})^{\lambda}}$ into our cost functional, where $\alpha$ helps is give a cost to each bound, not all necessarily the same, and $\lambda$ helps us control how much the difference between the dosage $D$ and the bound (lower or upper) matters.\\
+            
+
+Having incorporated our constraints into our functional, we first sought to apply Pontryagin's Maximum Principle which states that an optimal control $\tilde{\mathbf{u}}$ satisfies $\frac{DH}{D\mathbf{u}} = \mathbf{0}$, where $H(t, \x(t), \mathbf{u}(t),\mathbf{p}(t)) = \mathbf{p}\cdot \x^\prime - L$.
+
 
 
     \FancySubtitle[4mm][1cm]{Early Results \& Analysis}
@@ -203,9 +209,7 @@ As the sun dipped below the horizon, casting hues of orange and pink across the 
           \includegraphics[width=1\linewidth,trim={0 8cm 0 10cm},clip]{./imgs/img.png}
         \end{center}
         
-        As the sun dipped below the horizon, casting hues of orange and pink across the sky, the quaint village came to life with the soft chatter of its inhabitants. Children chased each other through narrow cobblestone streets, their laughter echoing against the ancient stone walls. The scent of freshly baked bread wafted from the local bakery, enticing passersby with its warm embrace. In the distance, the sound of church bells rang out, signaling the end of another peaceful day in this idyllic countryside retreat.
 
-As the sun dipped below the horizon, casting hues of orange and pink across the sky, the quaint village came to life with the soft chatter of its inhabitants. Children chased each other through narrow cobblestone streets, their laughter echoing against the ancient stone walls. The scent of freshly baked bread wafted from the local bakery, enticing passersby with its warm embrace. In the distance, the sound of church bells rang out, signaling the end of another peaceful day in this idyllic countryside retreat.
 
           \columnbreak  
  As the sun dipped below the horizon, casting hues of orange and pink across the sky, the quaint village came to life with the soft chatter of its inhabitants. Children chased each other through narrow cobblestone streets, their laughter echoing against the ancient stone walls. The scent of freshly baked bread wafted from the local bakery, enticing passersby with its warm embrace. In the distance, the sound of church bells rang out, signaling the end of another peaceful day in this idyllic countryside retreat.
