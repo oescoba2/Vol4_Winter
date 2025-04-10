@@ -4,4 +4,6 @@ Our project, for our modeling with dynamics class, was to find an optimal contro
 
 
 # Modeling the State using Michaelis-Menten Kinectics
-![dynamics](imgs/state_dynamics.gif)
+This is an animation of our system dynamics over time.
+This incorporates tumor lysis and cell recruitment.
+![dynamics](imgs/system_dynamics.gif)
